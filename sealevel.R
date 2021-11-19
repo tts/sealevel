@@ -77,12 +77,6 @@ gc()
 #----------- My home grid DEM 2m
 r_2 <- raster::raster("L4133D.tif")
 
-# Focus on Kalasatama and Arabia
-#
-# sf::st_bbox(r_2)
-# new_extent <- extent(386000, 389500, 6673000, 6676000)
-# r_2_cropped <- crop(x = r_2, y = new_extent)
-
 r_2.df <- raster::as.data.frame(r_2, xy = TRUE)
 
 r_2_levels <- (raster::extract(r_2, raster::extent(r_2)) %>%
@@ -101,3 +95,28 @@ ggplot(data = r_2.df, aes(x = x, y = y)) +
 
 ggsave("sealevelhki_east.pdf", width = 18, height = 12.2, device = cairo_pdf)
 ggsave("sealevelhki_east.png", width = 35, height = 25, dpi = 72, units = "cm", device = 'png')
+
+#------- Focus on Kalasatama and Arabia only
+
+sf::st_bbox(r_2)
+new_extent <- extent(386000, 389500, 6673000, 6676000)
+r_2_cropped <- crop(x = r_2, y = new_extent)
+
+r_2_cropped.df <- raster::as.data.frame(r_2_cropped, xy = TRUE)
+
+r_2_cropped_levels <- (raster::extract(r_2_cropped, raster::extent(r_2_cropped)) %>%
+                 range(finite = TRUE))[2] %>%
+  seq(0, ., by = 0.5)
+
+ggplot(data = r_2_cropped.df, aes(x = x, y = y)) +
+  geom_raster(aes(fill = L4133D)) +
+  geom_contour(aes(z = L4133D, color = "Now"), breaks = r_2_cropped_levels[2], size = 0.5) +
+  geom_contour(aes(z = L4133D, color = "3 m rise"), breaks = r_2_cropped_levels[7], size = 0.5) +
+  scale_fill_gradientn(colours = hcl.colors(15, palette = "Turku", rev = TRUE), na.value = "transparent") +
+  labs(title = "Helsinki coastline now, and when sea level rises",
+       subtitle = "Focus on Kalasatama and Arabia",
+       caption = "@ttso | Data: National Land Survey of Finland, Finnish Meteorological Institute",
+       fill = "Elevation", color = "Sea level")
+
+ggsave("sealevelhki_kalasatam_arabia.pdf", width = 18, height = 12.2, device = cairo_pdf)
+ggsave("sealevelhki_kalasatama_arabia.png", width = 35, height = 25, dpi = 72, units = "cm", device = 'png')
