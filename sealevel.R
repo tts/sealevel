@@ -63,11 +63,12 @@ ggplot(data = r_10.df, aes(x = x, y = y)) +
   geom_contour(aes(z = L4133, color = "3 m rise"), breaks = r_10_levels[7], size = 0.5) +
   scale_fill_gradientn(colours = hcl.colors(15, palette = "Turku", rev = TRUE), na.value = "transparent") +
   labs(title = "Helsinki coastline now, and when sea level rises", 
-       subtitle = paste0("The resent max mean water was ", as.numeric(maxrise$cm)*0.01, " m on ", as.character(maxrise$time)),
+       subtitle = paste0("Recent max mean water was ", as.numeric(maxrise$cm)*0.01, " m on ", str_extract(maxrise$time, "^[^T]+")),
        caption = "@ttso | Data: National Land Survey of Finland, Finnish Meteorological Institute",
        fill = "Elevation", color = "Sea level") 
 
 ggsave("sealevel_hki.pdf", width = 18, height = 12.2, device = cairo_pdf)
+ggsave("sealevel_hki.png", width = 35, height = 25, dpi = 72, units = "cm", device = 'png')
 
 rm(r_10)
 rm(r_10.df)
@@ -99,3 +100,4 @@ ggplot(data = r_2.df, aes(x = x, y = y)) +
        fill = "Elevation", color = "Sea level")
 
 ggsave("sealevelhki_east.pdf", width = 18, height = 12.2, device = cairo_pdf)
+ggsave("sealevelhki_east.png", width = 35, height = 25, dpi = 72, units = "cm", device = 'png')
